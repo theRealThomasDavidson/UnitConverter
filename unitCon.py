@@ -74,6 +74,7 @@ def parseUnit(toParse):
     for char in toParse:
         if len(retList)>0:
             if retList[-1]=="^":
+                ##TODO: handle the scales if this is true
                 if char=="-":
                     for ii in range(len(retList)):
                         if retList[-ii] =="/":
