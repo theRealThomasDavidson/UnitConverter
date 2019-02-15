@@ -52,6 +52,7 @@ def parseUnit(toParse):
     :return: a tuple of the form (list, dbl) where the first a list of units and the ops that are preformed on them in it's base state, and the second is the mutiplier for that unit.
     """
     retList=[]
+    scale=1
     prefix = {
         "Y": float(10 ** (24)), "Z": float(10 ** (21)), "E": float(10 ** (18)), "P": float(10 ** (15)),
         "T": float(10 ** (12)),
@@ -74,24 +75,31 @@ def parseUnit(toParse):
         if len(retList)>0:
             if retList[-1]=="^":
                 if char=="-":
-                    for ii in len(retList):
+                    for ii in range(len(retList)):
                         if retList[-ii] =="/":
                             retList[-ii]="*"
                             break
                         if retList[-ii] =="*":
                             retList[-ii]="/"
+                            break
                 else:
                     retList[-1]="^"+char
                 continue
 
         if char in prefix and lookForPref:
-            print char, prefix[char]
+            if len(retList) > 0:
+                for ii in range(len(retList)):
+                    if retList[-ii] =="/":
+                        scale /=prefix[char]
+                    if retList[-ii] =="*":
+                        scale *= prefix[char]
+
             lookForPref=0
             if len(unit)!=0:
                 retList.append(unit)
                 unit=""
         elif char in functs:
-            print char, functs[char]
+            #print char, functs[char]
             lookForPref=42
             if len(unit)!=0:
                 retList.append(unit)
@@ -100,10 +108,10 @@ def parseUnit(toParse):
             retList.append(char)
         else:
             unit=unit+char
-            print unit
+            #print unit
     if len(unit) != 0:
         retList.append(unit)
         unit = ""
-    return (retList, 0)
+    return (retList, scale)
 
 print parseUnit("nm*uin^2/Ys")
