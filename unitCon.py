@@ -64,55 +64,75 @@ def parseUnit(toParse):
         "y": float(10 ** (-24)),
     }
     functs = {
-        "/": "div", "*": "mul", "^": "exp"
-    }
+        "/": "div", "*": "mul", "^": "exp"}
 
 
     lookForPref = 42
     unit = ""
-
+    functPlace="*"
+    expBool=0
     for char in toParse:
+
+        #TODO: handle function things properly so that they are put into the units instead of
         if len(retList)>0:
-            if retList[-1]=="^":
-                ##TODO: handle the scales if this is true
+            if expBool:
+                holdLength=len(retList)
                 if char=="-":
-                    for ii in range(len(retList)):
-                        if retList[-ii] =="/":
-                            retList[-ii]="*"
+                    for ii in range(holdLength):
+                        if functPlace =="/":
+                            functPlace="*"
                             break
-                        if retList[-ii] =="*":
-                            retList[-ii]="/"
+                        if functPlace =="*":
+                            functPlace="/"
                             break
                 else:
-                    retList[-1]="^"+char
+                    number=int(char)
+                    for ii in range(holdLength):
+                        if retList[-ii] in functs:
+                            for index in range(1, number):
+                                for jj in range(holdLength-ii, holdLength-1):
+                                    retList.append(retList[jj])
+
+                lookForPref=42
+                expBool=0
                 continue
 
-        if char in prefix and lookForPref:
-            if len(retList) > 0:
-                for ii in range(len(retList)):
-                    if retList[-ii] =="/":
-                        scale /=prefix[char]
-                    if retList[-ii] =="*":
-                        scale *= prefix[char]
 
+        if char in prefix and lookForPref:
+
+            retList.append("pfix "+ functPlace +" "+char)
             lookForPref=0
             if len(unit)!=0:
-                retList.append(unit)
+                retList.append("unit "+unit)
                 unit=""
         elif char in functs:
             #print char, functs[char]
             lookForPref=42
             if len(unit)!=0:
-                retList.append(unit)
+                retList.append("unit "+ functPlace +" "+unit)
                 unit=""
-
-            retList.append(char)
-        else:
+            if char != "^":
+                functPlace=char
+            else:
+                expBool=42
+        elif not expBool:
             unit=unit+char
             #print unit
     if len(unit) != 0:
-        retList.append(unit)
+        retList.append("unit "+unit)
         unit = ""
-    return (retList, scale)
+    #by here the list is handled well but we need to
 
-print parseUnit("nm*uin^2/Ys")
+    return (retList, scale)
+string="nm*uin/Ys^2"
+print parseUnit(string), string
+
+
+"""
+       if char in prefix and lookForPref:
+            if len(retList) > 0:
+                for ii in range(len(retList)):
+                    if retList[-ii] =="/":
+                        scale /=prefix[char]
+                    if retList[-ii] =="*":
+                        scale *= prefix[char]"""
