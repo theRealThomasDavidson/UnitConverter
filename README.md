@@ -6,6 +6,24 @@ In the read in/parse I want to break metric units down to their base units and t
 When reading in values we only use the functions multiply, divide, and exponential.
 They are described in the input as "*", "/", and "^". respectivly.
 
+
+
+ROADMAP:
+
+TODO:
+
+1. work on passing inputs into the parser
+
+2. work on making sure units are able to be read by the prgroam
+
+3. work on converting units once they are in the program (I think I only need to add a scaling factor form the parser)
+
+4. testing
+
+5. making robust lists of convertable units
+
+6. testing
+
  
 
 # UnitConverter

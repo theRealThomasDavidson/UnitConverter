@@ -48,7 +48,7 @@ def convert(unitFrom = None, unitTo = None):
 def parseUnit(toParse):
     """
     this function should give me a unit in its most basic form
-    :param toParse:
+    :param toParse: a string that is basically how one would write out units where the functions you call are only "*","/", and "^".
     :return: a tuple of the form (list, dbl) where the first a list of units and the ops that are preformed on them in it's base state, and the second is the mutiplier for that unit.
     """
     retList=[]
@@ -74,31 +74,31 @@ def parseUnit(toParse):
     for char in toParse:
 
         holdLength = len(retList)
-        if len(retList)>0:
-            if expBool:
-                if char=="-":
-                    for ii in range(holdLength):
-                        if functPlace =="/":
-                            functPlace="*"
-                            break
-                        if functPlace =="*":
-                            functPlace="/"
-                            break
-                    retList[-1]=retList[-1][:5]+functPlace+retList[-1][6:]
-                    if retList[-2][:4]=="pfix":
-                        retList[-2] = retList[-2][:5] + functPlace + retList[-2][6:]
-                else:
-                    repeatList=[]
-                    number=int(char)
-                    repeatList.append(retList[-1])
-                    if retList[-2][:4] == "pfix":
-                        repeatList.append(retList[-2][:5] + functPlace + retList[-2][6:])
-                    for ii in range (1,number):
-                        for item in repeatList:
-                            retList.append(item)
-                    lookForPref=42
-                    expBool=0
-                continue
+        if len(retList)>0and expBool:
+
+            if char=="-":
+                for ii in range(holdLength):
+                    if functPlace =="/":
+                        functPlace="*"
+                        break
+                    if functPlace =="*":
+                        functPlace="/"
+                        break
+                retList[-1]=retList[-1][:5]+functPlace+retList[-1][6:]
+            if retList[-2][:4]=="pfix":
+                retList[-2] = retList[-2][:5] + functPlace + retList[-2][6:]
+            else:
+                repeatList=[]
+                number=int(char)
+                repeatList.append(retList[-1])
+                if retList[-2][:4] == "pfix":
+                    repeatList.append(retList[-2][:5] + functPlace + retList[-2][6:])
+                for ii in range (1,number):
+                    for item in repeatList:
+                        retList.append(item)
+                lookForPref=42
+                expBool=0
+            continue
 
 
         if char in prefix and lookForPref:
