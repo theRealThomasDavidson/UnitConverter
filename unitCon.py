@@ -73,10 +73,9 @@ def parseUnit(toParse):
     expBool=0
     for char in toParse:
 
-        #TODO: handle function things properly so that they are put into the units instead of
+        holdLength = len(retList)
         if len(retList)>0:
             if expBool:
-                holdLength=len(retList)
                 if char=="-":
                     for ii in range(holdLength):
                         if functPlace =="/":
@@ -85,16 +84,20 @@ def parseUnit(toParse):
                         if functPlace =="*":
                             functPlace="/"
                             break
+                    retList[-1]=retList[-1][:5]+functPlace+retList[-1][6:]
+                    if retList[-2][:4]=="pfix":
+                        retList[-2] = retList[-2][:5] + functPlace + retList[-2][6:]
                 else:
+                    repeatList=[]
                     number=int(char)
-                    for ii in range(holdLength):
-                        if retList[-ii] in functs:
-                            for index in range(1, number):
-                                for jj in range(holdLength-ii, holdLength-1):
-                                    retList.append(retList[jj])
-
-                lookForPref=42
-                expBool=0
+                    repeatList.append(retList[-1])
+                    if retList[-2][:4] == "pfix":
+                        repeatList.append(retList[-2][:5] + functPlace + retList[-2][6:])
+                    for ii in range (1,number):
+                        for item in repeatList:
+                            retList.append(item)
+                    lookForPref=42
+                    expBool=0
                 continue
 
 
@@ -122,11 +125,21 @@ def parseUnit(toParse):
         retList.append("unit "+unit)
         unit = ""
     #by here the list is handled well but we need to
-
+    retList=sorted(retList)
+    for possPfix in retList:
+        if possPfix[:4]=="pfix":
+            exp = 1
+            if possPfix[5] =="/":
+                exp=-1
+            scale*=prefix[possPfix[7]]**exp
+    retList=filter(lambda x: x[:4] != "pfix", retList)
     return (retList, scale)
-string="nm*uin/Ys^2"
-print parseUnit(string), string
+string="nm*uin^-2/ms^2"
 
+parse= parseUnit(string)
+
+print parse, string
+#print sorted( parseUnit(string)[0]), string
 
 """
        if char in prefix and lookForPref:
