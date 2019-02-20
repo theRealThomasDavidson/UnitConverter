@@ -16,7 +16,7 @@ def convert(unitFrom = None, unitTo = None):
         "Pa": 1., "bar": 100000., "at": 98066.5, "atm": 101325., "Torr": 133.322, "pfin": 6894.76
     }
     flowRateVol={
-        "Lps": 1., "cubftpmin": 2.11888, "cubmps": 0.001, "galps": 0.264172, "igillphr":25340.4
+        ("unit * L","unit /s"): 1., "cubftpmin": 2.11888, "cubmps": 0.001, "galps": 0.264172, "igillphr":25340.4
     }
     flowRateMass={
 
@@ -32,13 +32,21 @@ def convert(unitFrom = None, unitTo = None):
     #Add your dimensions here
     ##############
     dimensions={
-        "Pressure": pressure, "Volumetric Flow Rate":flowRateVol,"Mass Flow Rate": flowRateMass, "Length":length
-    }
+        "Pressure": pressure, "Volumetric Flow Rate":flowRateVol}#,"Mass Flow Rate": flowRateMass, "Length":length}
 
     #TODO: handle dimensional analysis
 
-    #TODO: handle prefixes for metric
+    uListFrom,scaleFrom=parseUnit(unitFrom)
+    #uListTo=parseUnit(unitTo)
 
+    uListFrom= tuple(uListFrom)
+    for dimension in dimensions:
+        print(dimension)
+
+        for item in dimensions[dimension]:
+            print(item,uListFrom)
+            if item==uListFrom:
+                print("hello")
 
 
 
@@ -48,7 +56,7 @@ def convert(unitFrom = None, unitTo = None):
 def parseUnit(toParse):
     """
     this function should give me a unit in its most basic form
-    :param toParse: a string that is basically how one would write out units where the functions you call are only "*","/", and "^".
+    :param toParse:
     :return: a tuple of the form (list, dbl) where the first a list of units and the ops that are preformed on them in it's base state, and the second is the mutiplier for that unit.
     """
     retList=[]
@@ -74,31 +82,31 @@ def parseUnit(toParse):
     for char in toParse:
 
         holdLength = len(retList)
-        if len(retList)>0and expBool:
-
-            if char=="-":
-                for ii in range(holdLength):
-                    if functPlace =="/":
-                        functPlace="*"
-                        break
-                    if functPlace =="*":
-                        functPlace="/"
-                        break
-                retList[-1]=retList[-1][:5]+functPlace+retList[-1][6:]
-            if retList[-2][:4]=="pfix":
-                retList[-2] = retList[-2][:5] + functPlace + retList[-2][6:]
-            else:
-                repeatList=[]
-                number=int(char)
-                repeatList.append(retList[-1])
-                if retList[-2][:4] == "pfix":
-                    repeatList.append(retList[-2][:5] + functPlace + retList[-2][6:])
-                for ii in range (1,number):
-                    for item in repeatList:
-                        retList.append(item)
-                lookForPref=42
-                expBool=0
-            continue
+        if holdLength>0:
+            if expBool:
+                if char=="-":
+                    for ii in range(holdLength):
+                        if functPlace =="/":
+                            functPlace="*"
+                            break
+                        if functPlace =="*":
+                            functPlace="/"
+                            break
+                    retList[-1]=retList[-1][:5]+functPlace+retList[-1][6:]
+                    if retList[-2][:4]=="pfix":
+                        retList[-2] = retList[-2][:5] + functPlace + retList[-2][6:]
+                else:
+                    repeatList=[]
+                    number=int(char)
+                    repeatList.append(retList[-1])
+                    if retList[-2][:4] == "pfix":
+                        repeatList.append(retList[-2][:5] + functPlace + retList[-2][6:])
+                    for ii in range (1,number):
+                        for item in repeatList:
+                            retList.append(item)
+                    lookForPref=42
+                    expBool=0
+                continue
 
 
         if char in prefix and lookForPref:
@@ -114,15 +122,21 @@ def parseUnit(toParse):
             if len(unit)!=0:
                 retList.append("unit "+ functPlace +" "+unit)
                 unit=""
+            if retList[-1][:4]=="pfix":
+                print("hi", retList[-1])
+                temp="unit"+retList[-1][4:]
+                del retList[-1]
+                retList.append(temp)
             if char != "^":
                 functPlace=char
             else:
                 expBool=42
         elif not expBool:
+            lookForPref=0
             unit=unit+char
             #print unit
     if len(unit) != 0:
-        retList.append("unit "+unit)
+        retList.append("unit "+functPlace+" "+unit)
         unit = ""
     #by here the list is handled well but we need to
     retList=sorted(retList)
@@ -134,11 +148,12 @@ def parseUnit(toParse):
             scale*=prefix[possPfix[7]]**exp
     retList=filter(lambda x: x[:4] != "pfix", retList)
     return (retList, scale)
-string="nm*uin^-2/ms^2"
+string="L/s"
 
-parse= parseUnit(string)
 
-print parse, string
+print(parseUnit("Mm^-1/in^4"))
+#convert("L/s")
+
 #print sorted( parseUnit(string)[0]), string
 
 """
