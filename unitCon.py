@@ -57,14 +57,7 @@ def convert(unitFrom = None, unitTo = None):
                "intensity":luminous, "mole":mol }
     #TODO: test how units in lists are handled.
     for units in baseUnits:
-        for item in baseUnits[units]:
-            if item!="base":
-                #print("this is the item",item[6:],units).
-                #print(item)
-                #print(parseUnit(item[7:])[0][0])
-
-                if parseUnit(item[7:])[0][0]!= item:
-                    print item,parseUnit(item[7:])[0][0],"\n"
+        print testForPrefixBreaks(baseUnits[units])
 
     uListFrom,scaleFrom=parseUnit(unitFrom)
     #uListTo=parseUnit(unitTo)
@@ -193,7 +186,20 @@ def main():
     #print(parseUnit("m^-1*thisisaunits*alsoaunit/notreqprefix/in^4"))
     print convert(string)
 
-def testForprefixbreaks()
+def testForPrefixBreaks(units):
+    retString="{"
+    for item in units:
+        if item != "base":
+            # print("this is the item",item[6:],units).
+            # print(item)
+            # print(parseUnit(item[7:])[0][0])
+            unit,scale=parseUnit(item[7:])
+            if unit[0] != item:
+                retString+="\""+str(unit[0])+"\":"+str(scale)+", "
+    if len(retString)==1:
+        return None
+    return retString[:-2]+"}"
+
 if __name__=="__main__":
     main()
 
